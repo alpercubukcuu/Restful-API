@@ -1,7 +1,11 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using RestfulAPI_Example.CustomerOperations.GetCustomer;
+using RestfulAPI_Example.DBOperation;
 using RestfulAPI_Example.Model;
 using System.Net;
+using System.Reflection.Metadata;
 
 namespace RestfulAPI_Example.Controllers
 {
@@ -9,35 +13,51 @@ namespace RestfulAPI_Example.Controllers
     [ApiController]
     public class ValuesController : ControllerBase
     {
+        private readonly DataContext _context;
 
-        Context db = new(); // Gerçek bir veri tabanı bağlantısı bulunmamaktadır. O yüzden oluşturualn actionlar null dönecektir! 
+        public ValuesController(DataContext context)
+        {
+            _context = context;
+
+        }        
 
         [HttpGet]
-        public IActionResult Example()
+        [Route("/GetCustomers")]
+        public IActionResult GetCustomers()
         {
-            return Ok();
+            GetCustomerQuery getCustomersQuery = new GetCustomerQuery(_context);
+            try
+            {                               
+                getCustomersQuery.Handle();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+           
+            return Ok(getCustomersQuery);
         }
 
         [HttpGet]
         [Route("/api/example/list")]
         public List<Customer> ListCustomer([FromQuery] string firstname)
         {
-            var name = db.Customers.Where(p => p.FirstName == firstname).ToList();
-            return name;
+            var List = _context.Customers.Where(p => p.FirstName == firstname).ToList();
+            return List;
         }
 
         [HttpPost]
         public string AddCustomer([FromBody] Customer customer)
         {
-            db.Customers.Add(customer);
-            db.SaveChanges();
+            _context.Customers.Add(customer);
+            _context.SaveChanges();
             return "Add is ok";
         }
 
         [HttpPut]
         public string UpdateCustomer([FromQuery] int id)
         {
-            var customer = db.Customers.FirstOrDefault(p => p.Id == id);
+            var customer = _context.Customers.FirstOrDefault(p => p.Id == id);
             Customer cts = new Customer()
             {
                 FirstName = customer.FirstName,
@@ -45,8 +65,8 @@ namespace RestfulAPI_Example.Controllers
                 PhoneNumber = customer.PhoneNumber
             };
 
-            db.Customers.Update(cts);
-            db.SaveChanges();
+            _context.Customers.Update(cts);
+            _context.SaveChanges();
 
             return "Update is ok";
         }
@@ -54,7 +74,7 @@ namespace RestfulAPI_Example.Controllers
         [HttpPatch("{id}")]
         public string UpdateCustomerForHeader(int id)
         {
-            Customer customer = db.Customers.First(p => p.Id == id);
+            Customer customer = _context.Customers.First(p => p.Id == id);
             try
             {
                 Customer cts = new Customer()
@@ -64,8 +84,8 @@ namespace RestfulAPI_Example.Controllers
                     PhoneNumber = customer.PhoneNumber
                 };
 
-                db.Customers.Update(cts);
-                db.SaveChanges();
+                _context.Customers.Update(cts);
+                _context.SaveChanges();
 
                 return "Update is ok";
 
@@ -86,10 +106,10 @@ namespace RestfulAPI_Example.Controllers
         [HttpDelete]
         public string DeleteCustomer([FromQuery] int id)
         {
-            var customer = db.Customers.First(p => p.Id == id);
+            var customer = _context.Customers.First(p => p.Id == id);
 
-            db.Remove(customer);
-            db.SaveChanges();
+            _context.Remove(customer);
+            _context.SaveChanges();
 
             return "Delete is ok";
         }
