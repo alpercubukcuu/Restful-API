@@ -1,11 +1,12 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using RestfulAPI_Example.CustomerOperations.GetCustomer;
+using RestfulAPI_Example.Features.Queries.GetCustomer;
 using RestfulAPI_Example.DBOperation;
-using RestfulAPI_Example.Model;
+using RestfulAPI_Example.Entities;
 using System.Net;
 using System.Reflection.Metadata;
+using AutoMapper;
 
 namespace RestfulAPI_Example.Controllers
 {
@@ -14,28 +15,30 @@ namespace RestfulAPI_Example.Controllers
     public class ValuesController : ControllerBase
     {
         private readonly DataContext _context;
+        private readonly IMapper _mapper;
 
-        public ValuesController(DataContext context)
+        public ValuesController(DataContext context, IMapper mapper)
         {
             _context = context;
-
-        }        
+            _mapper = mapper;
+        }
 
         [HttpGet]
         [Route("/GetCustomers")]
         public IActionResult GetCustomers()
         {
-            GetCustomerQuery getCustomersQuery = new GetCustomerQuery(_context);
+            GetCustomerQuery getCustomersQuery = new GetCustomerQuery(_context, _mapper);
+            List<CustomerViewModel> customer = new();
             try
-            {                               
-                getCustomersQuery.Handle();
+            {
+                customer = getCustomersQuery.Handle();
             }
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
            
-            return Ok(getCustomersQuery);
+            return Ok(customer);
         }
 
         [HttpGet]

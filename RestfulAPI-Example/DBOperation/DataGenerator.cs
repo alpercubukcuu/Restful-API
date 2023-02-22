@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using RestfulAPI_Example.Model;
+using RestfulAPI_Example.Entities;
 
 namespace RestfulAPI_Example.DBOperation
 {
@@ -16,7 +16,6 @@ namespace RestfulAPI_Example.DBOperation
                 context.Customers.AddRange(
                     new Customer
                     {
-
                         Id = 1,
                         FirstName = "Alper",
                         LastName = "Cubukcu",
@@ -40,6 +39,32 @@ namespace RestfulAPI_Example.DBOperation
                          CustomerType = 2 // Domestic (Yurt içi)
                     }
                  );
+
+
+                context.Autors.AddRange(
+                 new Autor
+                 {
+                     Id = 1,
+                     FirstName = "Alper",
+                     LastName = "Cubukcu",
+                     BirtDate =DateTime.Now
+                  
+                 },
+                  new Autor
+                  {
+                      Id = 2,
+                      FirstName = "Alp",
+                      LastName = "Cubukcu",
+                      BirtDate = DateTime.Now
+                  },
+                  new Autor
+                  {
+                      Id = 3,
+                      FirstName = "Ozge",
+                      LastName = "Cubukcu",
+                      BirtDate = DateTime.Now
+                  }
+              );
                 context.SaveChanges();
             }
 

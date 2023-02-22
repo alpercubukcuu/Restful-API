@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using RestfulAPI_Example.Model;
+using RestfulAPI_Example.Entities;
 using System.Net.Http.Headers;
 
 namespace RestfulAPI_Example.DBOperation
@@ -12,5 +12,7 @@ namespace RestfulAPI_Example.DBOperation
         }
 
         public DbSet<Customer> Customers { get; set; }
+
+        public DbSet<Autor> Autors { get; set; }
     }
 }
